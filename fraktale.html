@@ -1,0 +1,102 @@
+<html>
+<head>
+	<title>Fraktale</title>
+
+</head>
+
+<body>
+	<h1>Mandelbrot</h1>
+
+	<canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+	<input type="button" value="Mandelbrot zeichnen" onclick="MandelbrotMalen()">
+	<p>by st200916</p>
+</body>
+
+</html>
+
+
+<script>
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	var size = 1000;
+	var xd_min = -2.0;
+	var xd_delta = 2.5;
+	var yd_min = -1.25;
+	var yd_delta = 2.5;
+	var xp, xp_min = 0, xp_delta = 500;
+	var yp, yp_min = 0, yp_delta = 500;
+
+	var xd, yd;
+	
+	function getMousePos(canvas, evt) {
+		var rect = canvas.getBoundingClientRect();
+		return {
+		x: evt.clientX - rect.left,
+		y: evt.clientY - rect.top
+		};
+	}
+	
+	function MandelbrotMalen(){
+		for (xp = 0; xp < 500; xp++) {
+		for (yp = 0; yp < 500; yp++) {
+			xd = xd_min + xp * xd_delta / xp_delta;
+			yd = yd_min + yp * yd_delta / yp_delta;
+			var a_alt = xd;
+			var b_alt = yd;
+			var a_neu, b_neu;
+			var n;
+			var ab2;
+			for (n = 1; n < 255; n++) {
+				a_neu = (a_alt*a_alt) - (b_alt*b_alt) + xd;
+				b_neu = 2 * a_alt * b_alt + yd;
+				a_alt = a_neu;
+				b_alt = b_neu;
+				ab2 = ((a_alt*a_alt) + (b_alt*b_alt));
+				if (ab2 > 4) {
+					break;
+				}
+			}
+			if (ab2 > 4) {
+				ctx.fillStyle = "rgb("+n%255+",0,"+ab2+")";
+				ctx.fillRect(xp, yp, 1, 1); // Pixel fuer Pixel setzen
+			}
+			else {
+				ctx.fillStyle = "rgb(138, 43, 226)";
+				ctx.fillRect(xp, yp, 1, 1);
+			}
+		}
+	}
+	}
+	
+	canvas.addEventListener('click', function(event){ // click - Linksklick | contextmenu - Rechtsklick
+		var mousePos = getMousePos(canvas,event);
+		var xd = xd_min + mousePos.x * xd_delta / 500;
+		var yd = yd_min + mousePos.y * yd_delta / 500;
+
+		xd_delta = xd_delta / 2;
+		yd_delta = yd_delta / 2;
+
+		xd_min = xd - xd_delta / 2;
+		yd_min = yd - yd_delta / 2;
+
+		MandelbrotMalen();
+	})
+
+	canvas.addEventListener('contextmenu', function(event){ 
+		event.preventDefault();
+		var mousePos = getMousePos(canvas,event);
+		var xd = xd_min + mousePos.x * xd_delta / 500;
+		var yd = yd_min + mousePos.y * yd_delta / 500;
+
+		xd_delta = xd_delta * 2;
+		yd_delta = yd_delta * 2;
+
+		xd_min = xd - xd_delta / 2;
+		yd_min = yd - yd_delta / 2;
+
+		MandelbrotMalen();
+		return false;
+	}, false)
+	
+</script>
